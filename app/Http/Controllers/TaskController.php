@@ -74,6 +74,6 @@ class TaskController extends Controller
 
         $task->delete();
 
-        return redirect()->route('tasks.index')->with('status', 'Task deleted.');
+        return redirect()->route('tasks.index')->with('danger', 'Task deleted.');
     }
 }
