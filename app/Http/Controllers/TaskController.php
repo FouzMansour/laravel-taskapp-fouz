@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\TaskNotification;
+
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
@@ -40,12 +42,18 @@ class TaskController extends Controller
             'status' => TaskStatus::Pending,
         ]);
 
+        $task->assignee->notify(new TaskNotification($task, 'New task assigned to you: ' . $task->title));
+
         return redirect()->route('tasks.show', $task)->with('status', 'Task created.');
     }
+
 
     public function show(Task $task)
     {
         Gate::authorize('view', $task);
+        auth()->user()->unreadNotifications
+            ->where('data.task_id', $task->id)
+            ->markAsRead();
 
         return view('tasks.show', compact('task'));
     }

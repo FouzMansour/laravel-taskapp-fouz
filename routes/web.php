@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskStatusController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,7 +26,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/tasks/{task}/complete', [TaskStatusController::class, 'complete'])->name('tasks.complete');
     Route::patch('/tasks/{task}/approve', [TaskStatusController::class, 'approve'])->name('tasks.approve');
     Route::patch('/tasks/{task}/reject', [TaskStatusController::class, 'reject'])->name('tasks.reject');
+
+    Route::post('/notifications/{id}/read', function (Request $request, string $id) {
+        $request->user()->notifications()->where('id', $id)->first()?->markAsRead();
+
+        return response()->noContent();
+    })->name('notifications.read');
 });
 
-require __DIR__.'/auth.php';
-
+require __DIR__ . '/auth.php';

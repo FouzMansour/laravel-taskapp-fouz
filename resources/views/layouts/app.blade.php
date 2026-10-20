@@ -50,12 +50,49 @@
             </div>
             @endif
 
+            @php $unread = auth()->user()->unreadNotifications; @endphp
+
+            @if ($unread->count())
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+                <div class="p-4 bg-blue-50 text-blue-800 rounded">
+                    <strong>You have {{ $unread->count() }} new notification(s):</strong>
+                    <ul class="mt-2 list-disc ml-5">
+                        @foreach ($unread as $n)
+                        <li>
+                            <a href="{{ route('tasks.show', $n->data['task_id']) }}">{{ $n->data['message'] }}</a>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            @endif
+
+
             {{ $slot }}
-
-
-
         </main>
     </div>
+    <script>
+        window.addEventListener('load', () => {
+        window.Echo.private('App.Models.User.{{ auth()->id() }}')
+            .notification((n) => {
+                const box = document.createElement('div');
+                box.className = 'fixed top-4 right-4 bg-blue-600 text-white p-4 rounded shadow-lg z-50';
+                const link = document.createElement('a');
+                link.href = '/tasks/' + n.task_id;
+                link.textContent = n.message;
+                box.appendChild(link);
+                document.body.appendChild(box);
+                setTimeout(() => box.remove(), 6000);
+                fetch('/notifications/' + n.id + '/read', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                });
+            });
+    });
+    </script>
+
 </body>
 
 </html>
