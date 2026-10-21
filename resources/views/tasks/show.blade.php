@@ -5,7 +5,7 @@
 
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg p-6 space-y-3">
+            <div id="live-content"  class="bg-white shadow-sm sm:rounded-lg p-6 space-y-3">
                 <p><strong>Description:</strong> {{ $task->description ?? '-' }}</p>
                 <p><strong>Assignee:</strong> {{ $task->assignee->name }}</p>
                 <p><strong>Status:</strong> <x-status-badge :status="$task->status" /></p>

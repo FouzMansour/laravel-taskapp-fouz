@@ -71,27 +71,50 @@
             {{ $slot }}
         </main>
     </div>
-    <script>
-        window.addEventListener('load', () => {
-        window.Echo.private('App.Models.User.{{ auth()->id() }}')
-            .notification((n) => {
-                const box = document.createElement('div');
-                box.className = 'fixed top-4 right-4 bg-blue-600 text-white p-4 rounded shadow-lg z-50';
-                const link = document.createElement('a');
-                link.href = '/tasks/' + n.task_id;
-                link.textContent = n.message;
-                box.appendChild(link);
-                document.body.appendChild(box);
-                setTimeout(() => box.remove(), 6000);
-                fetch('/notifications/' + n.id + '/read', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                });
-            });
-    });
-    </script>
+  <script>
+    window.addEventListener('load', () => {
+        const userId = {{ auth()->id() }};
+
+        window.Echo.private('App.Models.User.' + userId)
+            .notification((n) => {
+                const box = document.createElement('div');
+                box.className = 'fixed top-4 right-4 bg-blue-600 text-white p-4 rounded shadow-lg z-50';
+                const link = document.createElement('a');
+                link.href = '/tasks/' + n.task_id;
+                link.textContent = n.message;
+                box.appendChild(link);
+                document.body.appendChild(box);
+                setTimeout(() => box.remove(), 6000);
+
+                fetch('/notifications/' + n.id + '/read', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                });
+            });
+
+        window.Echo.private('tasks.' + userId)
+            .listen('.task.updated', (e) => {
+                const path = window.location.pathname;
+                const onList = path === '/tasks';
+                const onThisTask = path === '/tasks/' + e.task_id;
+
+                if (!onList && !onThisTask) return;
+
+                const current = document.getElementById('live-content');
+                if (!current) return;
+
+                fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then((r) => r.text())
+                    .then((html) => {
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
+                        const fresh = doc.getElementById('live-content');
+                        if (fresh) current.innerHTML = fresh.innerHTML;
+                    });
+            });
+    });
+</script>
 
 </body>
 

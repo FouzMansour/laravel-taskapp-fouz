@@ -7,6 +7,8 @@ use App\Http\Requests\RejectTaskRequest;
 use App\Models\Task;
 use Illuminate\Support\Facades\Gate;
 use App\Notifications\TaskNotification;
+use App\Events\TaskUpdated;
+
 
 class TaskStatusController extends Controller
 {
@@ -18,7 +20,9 @@ class TaskStatusController extends Controller
             'status' => TaskStatus::Completed,
             'manager_note' => null,
         ]);
-        $task->creator->notify(new TaskNotification($task, $task->assignee->name. ' completed: '.$task->title));
+        TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
+
+        $task->creator->notify(new TaskNotification($task, $task->assignee->name . ' completed: ' . $task->title));
 
         return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
     }
@@ -28,7 +32,9 @@ class TaskStatusController extends Controller
         Gate::authorize('review', $task);
 
         $task->update(['status' => TaskStatus::Approved]);
-        $task->assignee->notify(new TaskNotification($task, 'your task was approved: '.$task->title));
+        TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
+
+        $task->assignee->notify(new TaskNotification($task, 'your task was approved: ' . $task->title));
 
         return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
     }
@@ -41,7 +47,9 @@ class TaskStatusController extends Controller
             'status' => TaskStatus::Rejected,
             'manager_note' => $request->validated()['manager_note'],
         ]);
-        $task->assignee->notify(new TaskNotification($task, 'your task was rejected: '.$task->title));
+        TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
+
+        $task->assignee->notify(new TaskNotification($task, 'your task was rejected: ' . $task->title));
 
 
         return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');

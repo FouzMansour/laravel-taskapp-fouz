@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\TaskNotification;
-
+use App\Events\TaskUpdated;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
@@ -41,6 +41,7 @@ class TaskController extends Controller
             'created_by' => $request->user()->id,
             'status' => TaskStatus::Pending,
         ]);
+        TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
         $task->assignee->notify(new TaskNotification($task, 'New task assigned to you: ' . $task->title));
 
@@ -72,6 +73,7 @@ class TaskController extends Controller
         Gate::authorize('update', $task);
 
         $task->update($request->validated());
+        TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
         return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
     }
@@ -81,6 +83,7 @@ class TaskController extends Controller
         Gate::authorize('delete', $task);
 
         $task->delete();
+        TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
         return redirect()->route('tasks.index')->with('danger', 'Task deleted.');
     }
