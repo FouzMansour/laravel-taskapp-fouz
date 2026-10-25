@@ -14,7 +14,7 @@ class TaskNotification extends Notification implements ShouldQueue
 
     public function __construct(
         public Task $task,
-        public string $message,
+        public string $messageKey,
     ) {}
 
     public function via(object $notifiable): array
@@ -27,7 +27,7 @@ class TaskNotification extends Notification implements ShouldQueue
         return [
             'task_id' => $this->task->id,
             'title' => $this->task->title,
-            'message' => $this->message,
+            'message_key' => $this->messageKey,
         ];
     }
 

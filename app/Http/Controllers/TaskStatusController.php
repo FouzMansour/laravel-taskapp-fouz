@@ -22,9 +22,11 @@ class TaskStatusController extends Controller
         ]);
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
-        $task->creator->notify(new TaskNotification($task, $task->assignee->name . ' completed: ' . $task->title));
+        $task->creator->notify(
+            new TaskNotification($task, 'Task completed: :title')
+        );
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
+        return redirect()->route('tasks.show', $task)->with('status', __('Task updated.'));
     }
 
     public function approve(Task $task)
@@ -34,9 +36,11 @@ class TaskStatusController extends Controller
         $task->update(['status' => TaskStatus::Approved]);
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
-        $task->assignee->notify(new TaskNotification($task, 'your task was approved: ' . $task->title));
+        $task->assignee->notify(
+            new TaskNotification($task, 'Task approved: :title')
+        );
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
+        return redirect()->route('tasks.show', $task)->with('status', __('Task updated.'));
     }
 
     public function reject(RejectTaskRequest $request, Task $task)
@@ -49,9 +53,11 @@ class TaskStatusController extends Controller
         ]);
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
-        $task->assignee->notify(new TaskNotification($task, 'your task was rejected: ' . $task->title));
+        $task->assignee->notify(
+            new TaskNotification($task, 'Task rejected: :title')
+        );
 
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
+        return redirect()->route('tasks.show', $task)->with('status', __('Task updated.'));
     }
 }

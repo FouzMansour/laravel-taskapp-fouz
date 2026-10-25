@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit task</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Edit task') }}</h2>
     </x-slot>
 
     <div class="py-12">
@@ -11,7 +11,7 @@
                     @method('PUT')
                     @include('tasks._form')
                     <div class="mt-6">
-                        <x-primary-button>Save</x-primary-button>
+                        <x-primary-button>{{ __('Save') }}</x-primary-button>
                     </div>
                 </form>
 

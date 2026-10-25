@@ -43,9 +43,9 @@ class TaskController extends Controller
         ]);
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
-        $task->assignee->notify(new TaskNotification($task, 'New task assigned to you: ' . $task->title));
+        $task->assignee->notify(new TaskNotification($task, 'New task assigned to you: :title'));
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Task created.');
+        return redirect()->route('tasks.show', $task)->with('status', __('Task created.'));
     }
 
 
@@ -75,7 +75,7 @@ class TaskController extends Controller
         $task->update($request->validated());
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Task updated.');
+        return redirect()->route('tasks.show', $task)->with('status', __('Task updated.'));
     }
 
     public function destroy(Task $task)
@@ -85,6 +85,6 @@ class TaskController extends Controller
         $task->delete();
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
 
-        return redirect()->route('tasks.index')->with('danger', 'Task deleted.');
+        return redirect()->route('tasks.index')->with('danger', __('Task deleted.'));
     }
 }

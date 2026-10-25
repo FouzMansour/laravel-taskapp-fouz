@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">New task</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('New task') }}</h2>
     </x-slot>
 
     <div class="py-12">
@@ -10,7 +10,7 @@
                     @csrf
                     @include('tasks._form', ['task' => null])
                     <div class="mt-6">
-                        <x-primary-button>Create</x-primary-button>
+                        <x-primary-button>{{ __('Create') }}</x-primary-button>
                     </div>
                 </form>
 

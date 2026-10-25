@@ -34,4 +34,13 @@ Route::middleware('auth')->group(function () {
     })->name('notifications.read');
 });
 
+Route::get('/lang/{locale}', function (string $locale) {
+    abort_unless(in_array($locale, ['en', 'ar']), 400);
+
+    session(['locale' => $locale]);
+
+    return back();
+})->name('lang.switch');
+
+
 require __DIR__ . '/auth.php';
