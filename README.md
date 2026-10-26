@@ -13,18 +13,26 @@ Built with Laravel 13, Blade, Breeze (login only), Laravel Reverb, SQLite, and P
 - Task lifecycle: `pending` -> `completed` -> `approved` (final) or `rejected` -> `completed` again.
 - Forbidden actions return a 403 page. All rules live in `app/Policies/TaskPolicy.php`.
 
+## Localization
+
+- Supports Arabic and English.
+- Users can switch languages using the language selector in the navigation bar.
+- The interface direction changes automatically: RTL for Arabic and LTR for English.
+- Notification messages are translated according to the recipient's currently selected language.
+- Notifications store translation keys instead of pre-translated messages, allowing them to be displayed in the selected language.
+
 ## Realtime notifications
 
 Realtime notifications use Laravel Reverb, Laravel Notifications, and Laravel Echo. Users receive them without refreshing the page.
 
 ### Notification events
 
-| Event | Who is notified |
-|---|---|
-| Manager creates and assigns a task | The assigned employee |
-| Employee completes a task | The manager who created it |
-| Manager approves a task | The assigned employee |
-| Manager rejects a task | The assigned employee |
+| Event                              | Who is notified            |
+| ---------------------------------- | -------------------------- |
+| Manager creates and assigns a task | The assigned employee      |
+| Employee completes a task          | The manager who created it |
+| Manager approves a task            | The assigned employee      |
+| Manager rejects a task             | The assigned employee      |
 
 ### Notification features
 
@@ -33,6 +41,7 @@ Realtime notifications use Laravel Reverb, Laravel Notifications, and Laravel Ec
 - If the user was offline, unread notifications appear in a banner the next time they open the app.
 - A notification is marked as read when it arrives live, or when the user opens the related task.
 - Each notification links to its task.
+- Notification messages support Arabic and English and are translated according to the recipient's selected language.
 
 ### Live updates
 
@@ -65,7 +74,7 @@ php artisan migrate:fresh --seed
 
 Make sure `.env` contains:
 
-```
+```env
 BROADCAST_CONNECTION=reverb
 QUEUE_CONNECTION=database
 ```
@@ -117,12 +126,12 @@ Then open http://localhost:8000 (if you use `composer run dev`) or your Herd URL
 
 All passwords are `password`.
 
-| Role | Email |
-|---|---|
-| Manager | manager@example.com |
-| Employee | ali@example.com |
-| Employee | sara@example.com |
-| Employee | omar@example.com |
+| Role     | Email               |
+| -------- | ------------------- |
+| Manager  | manager@example.com |
+| Employee | ali@example.com     |
+| Employee | sara@example.com    |
+| Employee | omar@example.com    |
 
 Public registration is disabled. Only the seeder creates users.
 
@@ -144,7 +153,10 @@ The feature tests are in `tests/Feature/TaskTest.php`. Notifications and broadca
 - `app/Http/Requests/`: form validation
 - `app/Notifications/TaskNotification.php`: database and broadcast notification
 - `app/Events/TaskUpdated.php`: broadcast event for live list/page updates
+- `app/Http/Middleware/SetLocale.php`: sets the active language from the session
+- `lang/ar.json`, `lang/en.json`: Arabic and English translation strings
 - `routes/channels.php`: private channel authorization
 - `routes/web.php`: routes, including the notification read endpoint
 - `resources/views/tasks/`: Blade views
 - `resources/views/layouts/app.blade.php`: Echo listeners and unread banner
+- `resources/views/layouts/navigation.blade.php`: navigation menu and language selector
