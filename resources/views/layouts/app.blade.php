@@ -22,56 +22,57 @@
 
         <!-- Page Heading -->
         @isset($header)
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                {{ $header }}
+            </div>
+        </header>
         @endisset
 
         <!-- Page Content -->
         <main>
 
             @if (session('status'))
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" x-transition
-                    class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
-                    <div class="p-4 bg-green-100 text-green-800 rounded shadow">
-                        {{ session('status') }}
-                    </div>
+            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" x-transition
+                class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+                <div class="p-4 bg-green-100 text-green-800 rounded shadow">
+                    {{ session('status') }}
                 </div>
+            </div>
             @endif
 
             @if (session('danger'))
-                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition
-                    class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
-                    <div class="p-4 bg-red-100 text-red-800 rounded shadow">
-                        {{ session('danger') }}
-                    </div>
+            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition
+                class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+                <div class="p-4 bg-red-100 text-red-800 rounded shadow">
+                    {{ session('danger') }}
                 </div>
+            </div>
             @endif
 
-            @php $unread = auth()->user()->unreadNotifications; @endphp
+            @php $unread = auth()->user()->unreadNotifications->filter(fn ($n) =>
+            \App\Models\Task::whereKey($n->data['task_id'])->exists()); @endphp
 
             @if ($unread->count())
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
-                    <div class="p-4 bg-blue-50 text-blue-800 rounded">
-                        <strong>{{ __('You have :count new notification(s):', ['count' => $unread->count()]) }}
-                        </strong>
-                        <ul class="mt-2 list-disc ml-5">
-                            @foreach ($unread as $n)
-                                <li>
-                                    <a href="{{ route('tasks.show', $n->data['task_id']) }}">
-                                        @if (isset($n->data['message_key']))
-                                            {{ __($n->data['message_key'], ['title' => $n->data['title'] ?? '']) }}
-                                        @else
-                                            {{ $n->data['message'] ?? '' }}
-                                        @endif
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-4">
+                <div class="p-4 bg-blue-50 text-blue-800 rounded">
+                    <strong>{{ __('You have :count new notification(s):', ['count' => $unread->count()]) }}
+                    </strong>
+                    <ul class="mt-2 list-disc ml-5">
+                        @foreach ($unread as $n)
+                        <li>
+                            <a href="{{ route('tasks.show', $n->data['task_id']) }}">
+                                @if (isset($n->data['message_key']))
+                                {{ __($n->data['message_key'], ['title' => $n->data['title'] ?? '']) }}
+                                @else
+                                {{ $n->data['message'] ?? '' }}
+                                @endif
+                            </a>
+                        </li>
+                        @endforeach
+                    </ul>
                 </div>
+            </div>
             @endif
 
 

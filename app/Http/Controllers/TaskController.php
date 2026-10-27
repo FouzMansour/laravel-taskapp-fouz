@@ -10,6 +10,8 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
+
 
 class TaskController extends Controller
 {
@@ -81,6 +83,9 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         Gate::authorize('delete', $task);
+        DB::table('notifications')
+            ->where('data->task_id', $task->id)
+            ->delete();
 
         $task->delete();
         TaskUpdated::dispatch($task->id, $task->assigned_to, $task->created_by);
